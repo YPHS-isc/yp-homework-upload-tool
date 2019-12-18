@@ -13,7 +13,7 @@ account=""
 password=""
 claas=""
 access_cookie=dict()
-bot_token=""
+bot_token=""//put your token
 
 bot = telegram.Bot(token=bot_token)
 
@@ -51,44 +51,44 @@ def new_post(title,content):
     if len(title)==0:
         title=date
     data={"__VIEWSTATE":viewstate,"__VIEWSTATEGENERATOR":viewstategenerator, "__EVENTVALIDATION":eventvalidation,"but_save":"儲存","tbox_purport":title,"tbox_content":content,"tbox_link":""}
-    print(requests.post(base_page_url+index_page_path,data=data,cookies=access_cookie).text)
+    requests.post(base_page_url+index_page_path,data=data,cookies=access_cookie)
     
 app=flask.Flask(__name__)
 @app.route('/webhook/homework_upload',methods=["POST"])
 def webhook(): #the function handle at https:://lee-tw.me/webhook/homework_upload
     update = telegram.Update.de_json(flask.request.get_json(force=True), bot)#pipe what we got in chat and pipe it into python-telegram-bot(module)
     dispatcher.process_update(update)
-    return ""
+    return "temp ok"
 
 dispatcher=Dispatcher(bot, None) #create a new dispatcher
 
-def post_handler(bot, update):    
-    
+def post_handler(bot, update):
     login()
+    x=update.message.text#.split(" ")[1].spilt("$")
     try :
-        x=update.message.text.spilt("$",1)
-        new_post(x[0],x[1])
-        update.message.reply_text("post_done")
+        x=x.split(' ')[1].split('$')
+        print(x[0],x[1])
+        new_post(x[0],x[1].replace('\\n','\n'))
+        update.message.reply_text("post_done\n標題:"+x[0]+"\n內文:"+x[1].replace('\\n','\n'))
     except:
-        update.message.reply_text("You might forget '$'")
+        update.message.reply_text("You might forget '$' or login failed")
 
-    
-
-def modify_handler(bot, update):
-    pass
+def debug_handler(bot,update):
+    update.message.reply_text("webhook ok")
 
 '''
+def modify_handler(bot, update):
+    pass
 def main():
     login()
     new_post(" ","這篇適用python requests submit der")
+    dispatcher.add_handler(CommandHandler("modify", modify_handler))
 ''' 
 
 dispatcher.add_handler(CommandHandler("post", post_handler))
-dispatcher.add_handler(CommandHandler("modify", modify_handler))
+dispatcher.add_handler(CommandHandler("debug", debug_handler))
 
 if __name__=="__main__":
-   
-    pass
-login()
-new_post("123","first line\nsecond line ")
+    app.run(port=5001)
+
 
