@@ -66,7 +66,7 @@ def post_handler(bot, update):
     login()
     x=update.message.text#.split(" ")[1].spilt("$")
     try :
-        x=x.split(' ')[1].split('$')
+    	x=x[6:].split('$')
         print(x[0],x[1])
         new_post(x[0],x[1].replace('\\n','\n'))
         update.message.reply_text("post_done\n標題:"+x[0]+"\n內文:"+x[1].replace('\\n','\n'))
